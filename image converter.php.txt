@@ -1,0 +1,1035 @@
+<?php
+
+/*
+
+ * Template Name: Image Converter Template
+
+ */
+
+
+
+get_header();
+
+?>
+
+
+
+<div id="primary" class="content-area">
+
+    <main id="main" class="site-main" role="main">
+
+        <div id="conversion-container">
+
+            <h2 class="conversion-title">Image Converter</h2>
+
+            <p class="conversion-description">Select an image file and choose the desired output format to convert it.</p>
+
+            <form id="image-converter-form" enctype="multipart/form-data">
+
+                <div class="form-group">
+
+                    <label for="image_file" class="file-label">Select an image file:</label>
+
+                    <input type="file" name="image_file" id="image_file" accept=".bmp, .dds, .dib, .djvu, .gif, .heic, .icns, .ico, .jp2, .jpe, .jpeg, .jpg, .png, .psd, .raw, .svg, .tiff, .tga, .webp" class="file-input">
+
+                    <span class="file-types">Supported types: BMP, DDS, DIB, DJVU, GIF, HEIC, ICNS, ICO, JP2, JPE, JPEG, PNG, PSD, RAW, SVG, TIFF, TGA, WEBP</span>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="output_format" class="select-label">Output format:</label>
+
+                    <select name="output_format" id="output_format" class="select-input">
+
+                        <option value="png">PNG</option>
+
+                        <option value="jpeg">JPEG</option>
+
+                        <option value="gif">GIF</option>
+
+                        <option value="bmp">BMP</option>
+
+                        <option value="tiff">TIFF</option>
+
+                        <option value="ico">ICO</option>
+
+                        <option value="svg">SVG</option>
+
+                    </select>
+
+                </div>
+
+                <div class="button-container">
+
+                    <button type="button" onclick="convertImage()" class="convert-button">Convert</button>
+
+                    <button type="button" onclick="resetForm()" class="reset-button">Reset</button>
+
+                </div>
+
+            </form>
+
+            <div id="conversion-loader" style="display: none;">
+
+                <div class="loader"></div>
+
+                <p class="conversion-message">Converting...</p>
+
+            </div>
+
+            <div id="conversion-result"></div>
+
+            <div id="download-button"></div>
+
+            <div id="conversion-messages"></div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+
+<style>
+
+    #conversion-container {
+
+        max-width: 600px;
+
+        margin: 0 auto;
+
+        padding: 20px;
+
+        background-color: #f5f5f5;
+
+        border: 1px solid #ccc;
+
+        border-radius: 5px;
+
+        text-align: center;
+
+    }
+
+
+
+    .conversion-title {
+
+        font-size: 24px;
+
+        margin-bottom: 10px;
+
+    }
+
+
+
+    .conversion-description {
+
+        font-size: 16px;
+
+        margin-bottom: 20px;
+
+    }
+
+
+
+    .form-group {
+
+        margin-bottom: 20px;
+
+    }
+
+
+
+    .file-label,
+
+    .select-label {
+
+        display: block;
+
+        font-size: 16px;
+
+        margin-bottom: 5px;
+
+        text-align: left;
+
+    }
+
+
+
+    .file-input,
+
+    .select-input {
+
+        padding: 10px;
+
+        border: 1px solid #ccc;
+
+        border-radius: 3px;
+
+        width: 100%;
+
+    }
+
+
+
+    .file-types {
+
+        font-size: 14px;
+
+        color: #666;
+
+        margin-top: 5px;
+
+        display: block;
+
+        text-align: left;
+
+    }
+
+
+
+    .button-container {
+
+        text-align: center;
+
+        margin-top: 20px;
+
+    }
+
+
+
+    .convert-button,
+
+    .reset-button {
+
+        padding: 10px 20px;
+
+        font-size: 16px;
+
+        background-color: #4CAF50;
+
+        color: #fff;
+
+        border: none;
+
+        border-radius: 3px;
+
+        cursor: pointer;
+
+        transition: background-color 0.3s ease;
+
+        margin-right: 10px;
+
+    }
+
+
+
+    .convert-button:hover,
+
+    .reset-button:hover {
+
+        background-color: #45a049;
+
+    }
+
+
+
+    .conversion-loader {
+
+        display: flex;
+
+        flex-direction: column;
+
+        align-items: center;
+
+        margin-top: 20px;
+
+    }
+
+
+
+    .loader {
+
+        display: inline-block;
+
+        width: 40px;
+
+        height: 40px;
+
+        border: 4px solid #f3f3f3;
+
+        border-top: 4px solid #3498db;
+
+        border-radius: 50%;
+
+        animation: spin 1s linear infinite;
+
+    }
+
+
+
+    .conversion-message {
+
+        font-size: 16px;
+
+        margin-top: 10px;
+
+    }
+
+
+
+    @keyframes spin {
+
+        0% {
+
+            transform: rotate(0deg);
+
+        }
+
+        100% {
+
+            transform: rotate(360deg);
+
+        }
+
+    }
+
+
+
+    #conversion-result {
+
+        margin-top: 20px;
+
+        text-align: center;
+
+    }
+
+
+
+    .conversion-result img {
+
+        max-width: 100%;
+
+    }
+
+
+
+    .download-link {
+
+        margin-top: 10px;
+
+        display: inline-block;
+
+        padding: 8px 16px;
+
+        font-size: 16px;
+
+        background-color: #337ab7;
+
+        color: #fff;
+
+        text-decoration: none;
+
+        border-radius: 3px;
+
+        transition: background-color 0.3s ease;
+
+    }
+
+
+
+    .download-link:hover {
+
+        background-color: #286090;
+
+    }
+
+
+
+    .conversion-messages {
+
+        margin-top: 20px;
+
+        text-align: center;
+
+    }
+
+
+
+    .error-message {
+
+        color: red;
+
+        font-weight: bold;
+
+        margin-bottom: 10px;
+
+    }
+
+
+
+    .success-message {
+
+        color: green;
+
+        font-weight: bold;
+
+        margin-bottom: 10px;
+
+    }
+
+</style>
+
+
+
+<script>
+
+    function convertImage() {
+
+        var inputFile = document.getElementById('image_file');
+
+        var outputFormat = document.getElementById('output_format').value;
+
+
+
+        // Check if a file is selected
+
+        if (inputFile.files.length > 0) {
+
+            var file = inputFile.files[0];
+
+
+
+            // Show loading indicator
+
+            document.getElementById('conversion-loader').style.display = 'block';
+
+
+
+            // Create a new FileReader
+
+            var reader = new FileReader();
+
+            reader.onload = function(e) {
+
+                // Create a new Image object
+
+                var img = new Image();
+
+                img.src = e.target.result;
+
+
+
+                // When the image has loaded
+
+                img.onload = function() {
+
+                    // Create a new canvas element
+
+                    var canvas = document.createElement('canvas');
+
+                    var ctx = canvas.getContext('2d');
+
+
+
+                    // Set the canvas dimensions to match the image
+
+                    canvas.width = img.width;
+
+                    canvas.height = img.height;
+
+
+
+                    // Draw the image on the canvas
+
+                    ctx.drawImage(img, 0, 0);
+
+
+
+                    // Convert the canvas to the desired output format
+
+                    var convertedImage = canvas.toDataURL('image/' + outputFormat);
+
+
+
+                    // Hide loading indicator
+
+                    document.getElementById('conversion-loader').style.display = 'none';
+
+
+
+                    
+
+
+
+                    // Create download link
+
+                    var downloadButton = document.getElementById('download-button');
+
+                    downloadButton.innerHTML = '<a href="' + convertedImage + '" download="converted_image.' + outputFormat + '" class="download-link">Download Converted Image</a>';
+
+                }
+
+            }
+
+
+
+            // Read the file as data URL
+
+            reader.readAsDataURL(file);
+
+        }
+
+    }
+
+
+
+    function resetForm() {
+
+        document.getElementById('image-converter-form').reset();
+
+        document.getElementById('conversion-result').innerHTML = '';
+
+        document.getElementById('download-button').innerHTML = '';
+
+        document.getElementById('conversion-messages').innerHTML = '';
+
+    }
+
+</script>
+
+
+
+<?php get_footer(); ?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+/*
+
+Template Name: Image Converter Template
+
+*/
+
+get_header();
+
+?>
+
+
+
+<div id="primary" class="content-area">
+
+    <main id="main" class="site-main" role="main">
+
+        <div id="conversion-container">
+
+            <h2 class="conversion-title">Image Converter</h2>
+
+            <p class="conversion-description">Select an image file and choose the desired output format to convert it.</p>
+
+            <form id="image-converter-form" enctype="multipart/form-data">
+
+                <div class="form-group">
+
+                    <label for="image_file" class="file-label">Select an image file:</label>
+
+                    <input type="file" name="image_file" id="image_file" accept=".bmp, .dds, .dib, .djvu, .gif, .heic, .icns, .ico, .jp2, .jpe, .jpeg, .jpg, .png, .psd, .raw, .svg, .tiff, .tga, .webp" class="file-input">
+
+                    <span class="file-types">Supported types: BMP, DDS, DIB, DJVU, GIF, HEIC, ICNS, ICO, JP2, JPE, JPEG, PNG, PSD, RAW, SVG, TIFF, TGA, WEBP</span>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="output_format" class="select-label">Output format:</label>
+
+                    <select name="output_format" id="output_format" class="select-input">
+
+                        <option value="png">PNG</option>
+
+                        <option value="jpeg">JPEG</option>
+
+                        <option value="gif">GIF</option>
+
+                        <option value="bmp">BMP</option>
+
+                        <option value="tiff">TIFF</option>
+
+                        <option value="pdf">PDF</option>
+
+                        <option value="ai">AI</option>
+
+                        <option value="ico">ICO</option>
+
+                        <option value="svg">SVG</option>
+
+                    </select>
+
+                </div>
+
+                <div class="button-container">
+
+                    <button type="button" onclick="convertImage()" class="convert-button">Convert</button>
+
+                    <button type="button" onclick="resetForm()" class="reset-button">Reset</button>
+
+                </div>
+
+            </form>
+
+
+
+            <div id="conversion-loader" style="display: none;">
+
+                <img src="path/to/loader.gif" alt="Loading..." class="loader">
+
+                <p class="conversion-message">Converting...</p>
+
+            </div>
+
+
+
+            <div id="conversion-result"></div>
+
+
+
+            <div id="download-button"></div>
+
+
+
+            <div id="conversion-messages"></div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+
+<style>
+
+    #conversion-container {
+
+        max-width: 600px;
+
+        margin: 0 auto;
+
+        padding: 20px;
+
+        background-color: #f5f5f5;
+
+        border: 1px solid #ccc;
+
+        border-radius: 5px;
+
+    }
+
+
+
+    .conversion-title {
+
+        font-size: 24px;
+
+        margin-bottom: 10px;
+
+    }
+
+
+
+    .conversion-description {
+
+        font-size: 16px;
+
+        margin-bottom: 20px;
+
+    }
+
+
+
+    .form-group {
+
+        margin-bottom: 20px;
+
+    }
+
+
+
+    .file-label {
+
+        display: block;
+
+        font-size: 16px;
+
+        margin-bottom: 5px;
+
+    }
+
+
+
+    .file-input {
+
+        padding: 10px;
+
+        border: 1px solid #ccc;
+
+        border-radius: 3px;
+
+        width: 100%;
+
+    }
+
+
+
+    .select-label {
+
+        display: block;
+
+        font-size: 16px;
+
+        margin-bottom: 5px;
+
+    }
+
+
+
+    .select-input {
+
+        padding: 10px;
+
+        border: 1px solid #ccc;
+
+        border-radius: 3px;
+
+        width: 100%;
+
+    }
+
+
+
+    .file-types {
+
+        font-size: 14px;
+
+        color: #666;
+
+        margin-top: 5px;
+
+        display: block;
+
+    }
+
+
+
+    .button-container {
+
+        text-align: center;
+
+        margin-top: 20px;
+
+    }
+
+
+
+    .convert-button,
+
+    .reset-button {
+
+        padding: 10px 20px;
+
+        font-size: 16px;
+
+        background-color: #4CAF50;
+
+        color: #fff;
+
+        border: none;
+
+        border-radius: 3px;
+
+        cursor: pointer;
+
+        transition: background-color 0.3s ease;
+
+    }
+
+
+
+    .convert-button:hover,
+
+    .reset-button:hover {
+
+        background-color: #45a049;
+
+    }
+
+
+
+    .conversion-result {
+
+        margin-top: 20px;
+
+        text-align: center;
+
+    }
+
+
+
+    .conversion-result img {
+
+        max-width: 100%;
+
+    }
+
+
+
+    .download-link {
+
+        margin-top: 10px;
+
+        display: inline-block;
+
+        padding: 8px 16px;
+
+        font-size: 16px;
+
+        background-color: #337ab7;
+
+        color: #fff;
+
+        text-decoration: none;
+
+        border-radius: 3px;
+
+        transition: background-color 0.3s ease;
+
+    }
+
+
+
+    .download-link:hover {
+
+        background-color: #286090;
+
+    }
+
+
+
+    .conversion-messages {
+
+        margin-top: 20px;
+
+        text-align: center;
+
+    }
+
+
+
+    .error-message {
+
+        color: red;
+
+        font-weight: bold;
+
+        margin-bottom: 10px;
+
+    }
+
+
+
+    .success-message {
+
+        color: green;
+
+        font-weight: bold;
+
+        margin-bottom: 10px;
+
+    }
+
+
+
+    .loader {
+
+        display: block;
+
+        margin: 0 auto;
+
+    }
+
+
+
+    .conversion-message {
+
+        text-align: center;
+
+        font-size: 16px;
+
+        margin-top: 10px;
+
+    }
+
+</style>
+
+
+
+<script>
+
+    function convertImage() {
+
+        var inputFile = document.getElementById('image_file');
+
+        var outputFormat = document.getElementById('output_format').value;
+
+
+
+        // Check if a file is selected
+
+        if (inputFile.files.length > 0) {
+
+            var file = inputFile.files[0];
+
+
+
+            // Show loading indicator
+
+            document.getElementById('conversion-loader').style.display = 'block';
+
+
+
+            // Create a new FileReader
+
+            var reader = new FileReader();
+
+            reader.onload = function(e) {
+
+                // Create a new Image object
+
+                var img = new Image();
+
+                img.src = e.target.result;
+
+
+
+                // When the image has loaded
+
+                img.onload = function() {
+
+                    // Create a new canvas element
+
+                    var canvas = document.createElement('canvas');
+
+                    var ctx = canvas.getContext('2d');
+
+
+
+                    // Set the canvas dimensions to match the image
+
+                    canvas.width = img.width;
+
+                    canvas.height = img.height;
+
+
+
+                    // Draw the image on the canvas
+
+                    ctx.drawImage(img, 0, 0);
+
+
+
+                    // Convert the canvas to the specified output format
+
+                    var convertedDataUrl = canvas.toDataURL('image/' + outputFormat);
+
+
+
+                    // Display the converted image
+
+                    var resultContainer = document.getElementById('conversion-result');
+
+                    resultContainer.innerHTML = '<img src="' + convertedDataUrl + '" alt="Converted Image">';
+
+                    resultContainer.style.display = 'block';
+
+
+
+                    // Hide loading indicator
+
+                    document.getElementById('conversion-loader').style.display = 'none';
+
+
+
+                    // Scroll to the result section
+
+                    resultContainer.scrollIntoView();
+
+
+
+                    // Display success message and download button
+
+                    document.getElementById('conversion-messages').innerHTML = '<div class="success-message">Conversion completed successfully.</div>';
+
+                    document.getElementById('download-button').innerHTML = '<a href="' + convertedDataUrl + '" download="converted_image.' + outputFormat + '" class="download-link">Download</a>';
+
+                };
+
+            };
+
+            reader.readAsDataURL(file);
+
+        } else {
+
+            // No file selected, display error message
+
+            document.getElementById('conversion-messages').innerHTML = '<div class="error-message">Please select an image file.</div>';
+
+            document.getElementById('download-button').innerHTML = '';
+
+        }
+
+    }
+
+
+
+    function resetForm() {
+
+        var form = document.getElementById('image-converter-form');
+
+        form.reset();
+
+        document.getElementById('conversion-result').innerHTML = '';
+
+        document.getElementById('conversion-result').style.display = 'none';
+
+        document.getElementById('conversion-messages').innerHTML = '';
+
+        document.getElementById('conversion-messages').scrollIntoView(); // Scroll to the top of the form
+
+        document.getElementById('download-button').innerHTML = '';
+
+    }
+
+</script>
+
+
+
+<?php
+
+get_footer();
+
+?>
+
